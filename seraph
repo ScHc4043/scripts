@@ -34,7 +34,7 @@ local lerpedFlySpeed, totalSpeed = 0, 1;
 
 local _assets = game:GetObjects("rbxassetid://96007083256961")[1]:Clone()
 
-function xpcall(...)
+local function xpcall(...)
 	for _, toPcall in {...} do
 		if pcall(toPcall) then break end
 	end
@@ -42,9 +42,15 @@ end
 
 local cons = {}
 
-local peakAsset = game:GetObjects("rbxassetid://113170053514092")[1]:Clone()
-peakAsset.Size = Vector3.zero
-peakAsset.Anchored, peakAsset.CanCollide, peakAsset.CanTouch, peakAsset.CanQuery = true, false, false, false
+local peakAsset = (function()
+	local asset = game:GetObjects("rbxassetid://113170053514092")[1]:Clone()
+	asset.Size = Vector3.zero
+	asset.Anchored = true
+	asset.CanCollide = false
+	asset.CanTouch = false
+	asset.CanQuery = false
+	return asset
+end)()
 
 local visualization = peakAsset:Clone()
 -- draw visualization
@@ -89,15 +95,10 @@ do
 				local f = Instance.new("Frame")
 				f.AnchorPoint = Vector2.new(0.5, 0.5)
 				f.Size = UDim2.fromOffset(sideLen + 1, thickness)
-				f.Position = UDim2.fromOffset(
-					size.X / 2 + x,
-					size.Y / 2 + y
-				)
+				f.Position = UDim2.fromOffset(size.X / 2 + x, size.Y / 2 + y)
 				f.Rotation = math.deg(angle) + 90
 				f.BorderSizePixel = 0
-				f.BackgroundColor3 =
-					Color3.fromHSV(i / (segments - 1), 1, 1):Lerp(Color3.new(1,1,1), .5)
-
+				f.BackgroundColor3 = Color3.fromHSV(i / (segments - 1), 1, 1):Lerp(Color3.new(1,1,1), .5)
 				f.Parent = frame
 				table.insert(pieces, f)
 			end
@@ -126,18 +127,7 @@ makefolder("seraph/debug")
 makefolder("seraph/configs")
 makefolder("seraph/sounds")
 
-for soundPath, soundUrl in {
-	["seraph/sounds/bubble.mp3"] = "https://github.com/ravegirls/meow/raw/refs/heads/main/gmod_bubble.mp3",
-	["seraph/sounds/bubble2.mp3"] = "https://github.com/ravegirls/meow/raw/refs/heads/main/gmod_bubble_2.mp3",
-	["seraph/sounds/trident.mp3"] = "https://github.com/ravegirls/meow/raw/refs/heads/main/trident-new.mp3",
-}
- do
-	if not isfile(soundPath) then
-		writefile(soundPath, game:HttpGet(soundUrl))
-	end
-end
 
---if run_debug then pcall(delfile, "seraph/cache/seraph.gif") pcall(delfile, "seraph/debug/debug.log") end
 pcall(function()
 	local defaultConfig = readfile("seraph/configs/default.value")
 	if defaultConfig then
@@ -156,9 +146,6 @@ function get(url)
 			["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 SeraphClient/1.0 Chocosploit/1.0"
 		}
 	}).Body
-end
-function setproperty(obj, prop, value)
-	obj[prop] = value
 end
 
 local isDone
@@ -275,9 +262,9 @@ task.spawn(function()
 	frame.Visible = false
 	task.wait(1)
 	frame.Visible = true
-	setproperty(fps,"TextTransparency",1)
-	setproperty(icon,"ImageTransparency",1)
-	setproperty(frame,"BackgroundTransparency",1)
+	fps.TextTransparency = 1
+	icon.ImageTransparency = 1
+	frame.BackgroundTransparency = 1
 	tween_service:Create(fps, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextTransparency = 0}):Play()
 	tween_service:Create(icon, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {ImageTransparency = 0}):Play()
 	tween_service:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
@@ -285,7 +272,7 @@ task.spawn(function()
 	for _, stroke in frame:GetChildren() do
 		if not stroke:IsA("UIStroke") then continue end
 		local trans = stroke.Transparency
-		setproperty(stroke,"Transparency",1)
+		stroke.Transparency = 1
 		tween_service:Create(stroke, TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Transparency = trans}):Play()
 	end
 
@@ -572,60 +559,26 @@ local themes = {
 }
 
 local keys = {
-	[Enum.KeyCode.LeftShift] = "LS",
-	[Enum.KeyCode.RightShift] = "RS",
-	[Enum.KeyCode.LeftControl] = "LC",
-	[Enum.KeyCode.RightControl] = "RC",
-	[Enum.KeyCode.Insert] = "INS",
-	[Enum.KeyCode.Backspace] = "BS",
-	[Enum.KeyCode.Return] = "Ent",
-	[Enum.KeyCode.LeftAlt] = "LA",
-	[Enum.KeyCode.RightAlt] = "RA",
-	[Enum.KeyCode.CapsLock] = "CAPS",
-	[Enum.KeyCode.One] = "1",
-	[Enum.KeyCode.Two] = "2",
-	[Enum.KeyCode.Three] = "3",
-	[Enum.KeyCode.Four] = "4",
-	[Enum.KeyCode.Five] = "5",
-	[Enum.KeyCode.Six] = "6",
-	[Enum.KeyCode.Seven] = "7",
-	[Enum.KeyCode.Eight] = "8",
-	[Enum.KeyCode.Nine] = "9",
-	[Enum.KeyCode.Zero] = "0",
-	[Enum.KeyCode.KeypadOne] = "Num1",
-	[Enum.KeyCode.KeypadTwo] = "Num2",
-	[Enum.KeyCode.KeypadThree] = "Num3",
-	[Enum.KeyCode.KeypadFour] = "Num4",
-	[Enum.KeyCode.KeypadFive] = "Num5",
-	[Enum.KeyCode.KeypadSix] = "Num6",
-	[Enum.KeyCode.KeypadSeven] = "Num7",
-	[Enum.KeyCode.KeypadEight] = "Num8",
-	[Enum.KeyCode.KeypadNine] = "Num9",
-	[Enum.KeyCode.KeypadZero] = "Num0",
-	[Enum.KeyCode.Minus] = "-",
-	[Enum.KeyCode.Equals] = "=",
-	[Enum.KeyCode.Tilde] = "~",
-	[Enum.KeyCode.LeftBracket] = "[",
-	[Enum.KeyCode.RightBracket] = "]",
-	[Enum.KeyCode.RightParenthesis] = ")",
-	[Enum.KeyCode.LeftParenthesis] = "(",
-	[Enum.KeyCode.Semicolon] = ",",
-	[Enum.KeyCode.Quote] = "'",
-	[Enum.KeyCode.BackSlash] = "\\",
-	[Enum.KeyCode.Comma] = ",",
-	[Enum.KeyCode.Period] = ".",
-	[Enum.KeyCode.Slash] = "/",
-	[Enum.KeyCode.Asterisk] = "*",
-	[Enum.KeyCode.Plus] = "+",
-	[Enum.KeyCode.Period] = ".",
-	[Enum.KeyCode.Backquote] = "`",
-	[Enum.UserInputType.MouseButton1] = "MB1",
-	[Enum.UserInputType.MouseButton2] = "MB2",
-	[Enum.UserInputType.MouseButton3] = "MB3",
-	[Enum.KeyCode.Escape] = "ESC",
-	[Enum.KeyCode.Space] = "SPC",
-}
-
+		[Enum.KeyCode.LeftShift] = "LS", [Enum.KeyCode.RightShift] = "RS", 
+		[Enum.KeyCode.LeftControl] = "LC", [Enum.KeyCode.RightControl] = "RC",
+		[Enum.KeyCode.Insert] = "INS", [Enum.KeyCode.Backspace] = "BS",
+		[Enum.KeyCode.Return] = "Ent", [Enum.KeyCode.LeftAlt] = "LA", [Enum.KeyCode.RightAlt] = "RA",
+		[Enum.KeyCode.CapsLock] = "CAPS",
+		[Enum.KeyCode.One] = "1", [Enum.KeyCode.Two] = "2", [Enum.KeyCode.Three] = "3", [Enum.KeyCode.Four] = "4", 
+		[Enum.KeyCode.Five] = "5", [Enum.KeyCode.Six] = "6", [Enum.KeyCode.Seven] = "7", [Enum.KeyCode.Eight] = "8",
+		[Enum.KeyCode.Nine] = "9", [Enum.KeyCode.Zero] = "0",
+		[Enum.KeyCode.KeypadOne] = "Num1", [Enum.KeyCode.KeypadTwo] = "Num2", [Enum.KeyCode.KeypadThree] = "Num3",
+		[Enum.KeyCode.KeypadFour] = "Num4", [Enum.KeyCode.KeypadFive] = "Num5", [Enum.KeyCode.KeypadSix] = "Num6",
+		[Enum.KeyCode.KeypadSeven] = "Num7", [Enum.KeyCode.KeypadEight] = "Num8", [Enum.KeyCode.KeypadNine] = "Num9",
+		[Enum.KeyCode.KeypadZero] = "Num0",
+		[Enum.KeyCode.Minus] = "-", [Enum.KeyCode.Equals] = "=", [Enum.KeyCode.Tilde] = "~",
+		[Enum.KeyCode.LeftBracket] = "[", [Enum.KeyCode.RightBracket] = "]", [Enum.KeyCode.RightParenthesis] = ")",
+		[Enum.KeyCode.LeftParenthesis] = "(", [Enum.KeyCode.Semicolon] = ",", [Enum.KeyCode.Quote] = "'",
+		[Enum.KeyCode.BackSlash] = "\\", [Enum.KeyCode.Comma] = ",", [Enum.KeyCode.Period] = ".",
+		[Enum.KeyCode.Slash] = "/", [Enum.KeyCode.Asterisk] = "*", [Enum.KeyCode.Plus] = "+", [Enum.KeyCode.Backquote] = "`",
+		[Enum.UserInputType.MouseButton1] = "MB1", [Enum.UserInputType.MouseButton2] = "MB2", [Enum.UserInputType.MouseButton3] = "MB3",
+		[Enum.KeyCode.Escape] = "ESC", [Enum.KeyCode.Space] = "SPC",
+	}
 library.__index = library
 
 for _, path in next, library.folders do 
@@ -737,9 +690,7 @@ function library:resizify(frame)
 	Frame.Text = ""
 
 	local resizing = false 
-	local start_size 
-	local start 
-	local og_size = frame.Size  
+	local start_size, start, og_size = frame.Size, nil, frame.Size
 
 	Frame.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -757,24 +708,13 @@ function library:resizify(frame)
 
 	library:connection(uis.InputChanged, function(input, game_event) 
 		if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
-			local viewport_x = camera.ViewportSize.X
-			local viewport_y = camera.ViewportSize.Y
-
-			local current_size = dim2(
+			local vp_x, vp_y = camera.ViewportSize.X, camera.ViewportSize.Y
+			frame.Size = dim2(
 				start_size.X.Scale,
-				math.clamp(
-					start_size.X.Offset + (input.Position.X - start.X),
-					og_size.X.Offset,
-					viewport_x
-				),
+				math.clamp(start_size.X.Offset + (input.Position.X - start.X), og_size.X.Offset, vp_x),
 				start_size.Y.Scale,
-				math.clamp(
-					start_size.Y.Offset + (input.Position.Y - start.Y),
-					og_size.Y.Offset,
-					viewport_y
-				)
+				math.clamp(start_size.Y.Offset + (input.Position.Y - start.Y), og_size.Y.Offset, vp_y)
 			)
-			frame.Size = current_size
 		end
 	end)
 end
@@ -817,22 +757,12 @@ function library:draggify(frame, scale)
 			local viewport_x = camera.ViewportSize.X
 			local viewport_y = camera.ViewportSize.Y
 
-			local current_position = dim2(
+			frame.Position = dim2(
 				0,
-				floor(clamp(
-					start_size.X.Offset + (input.Position.X - start.X),
-					0,
-					viewport_x - frame.Size.X.Offset
-					) / scale) * scale,
+				floor(clamp(start_size.X.Offset + (input.Position.X - start.X), 0, viewport_x - frame.Size.X.Offset) / scale) * scale,
 				0,
-				floor(clamp(
-					start_size.Y.Offset + (input.Position.Y - start.Y),
-					0,
-					viewport_y - frame.Size.Y.Offset
-					) / scale) * scale
+				floor(clamp(start_size.Y.Offset + (input.Position.Y - start.Y), 0, viewport_y - frame.Size.Y.Offset) / scale) * scale
 			)
-
-			frame.Position = current_position
 		end
 	end)
 end 
@@ -960,14 +890,10 @@ end
 
 function library:update_theme(theme, color)
 	for _, property in themes.utility[theme] do 
-
 		for m, object in property do 
-			if object[_] == themes.preset[theme] then 
-				object[_] = color 
-			end
+			object[_] = color 
 		end 
 	end 
-
 	themes.preset[theme] = color 
 end 
 
@@ -5554,17 +5480,6 @@ function draw_bullet(from, to, playSound)
 	if not flags.bullet_tracers then return end
 	local func = bullets[flags.bullet_tracer_style]
 	task.spawn(func, from, to, playSound)
-	local sfxId = sfx[flags.killsound_l]
-	if sfxId and (playSound == nil or playSound == true) then
-		local sound = Instance.new("Sound")
-		sound.SoundId = sfxId
-		sound.Name = ""
-		sound.Volume = flags.sound_volume or 1.0
-		sound.PlaybackSpeed = flags.pitchrng_l and math.random(95, 105) / 100 or 1
-		sound.PlayOnRemove = true
-		sound.Parent = services.soundService
-		task.delay(0, game.Destroy, sound)
-	end
 end
 
 local barsRendered, listAdd = {}, 0
@@ -5802,14 +5717,6 @@ if game.GameId == 113491250 then
 	-- Exploits Tab
 	local exploits = manip_multi:get_tab("misc")
 	exploits:toggle({name = "auto spawn", flag = "autospawn", tip = "palantir ai auto spawn xp farm v6"})
-	local burst_exploit = exploits:keybind({name = "firerate bypass", flag = "burst_exploit", tip = "Abuses a vulnerability to shoot multiple rounds.", display = "rapidfire"})
-	exploits:dropdown({
-		name = "firerate mode",
-		flag = "rapidfire_type",
-		items = {"regular", "onshot", "triple"},
-		multi = false,
-		scrolling = true
-	})
 
 	-- Ghosting / Tickbase Tab
 	local ghosting = manip_multi:get_tab("backtrack")
@@ -5855,14 +5762,6 @@ if game.GameId == 113491250 then
 		return flags.auto_move
 	end)
 	manipulation:toggle({name = "auto spawn", flag = "autospawn", tip = "palantir ai auto spawn xp farm v6"})
-	local burst_exploit = manipulation:keybind({name = "firerate bypass", flag = "burst_exploit", tip = "Abuses a vulnerability to shoot multiple rounds.", display = "rapidfire"})
-	manipulation:dropdown({
-		name = "firerate mode",
-		flag = "rapidfire_type",
-		items = {"regular", "onshot", "triple"},
-		multi = false,
-		scrolling = true
-	})
 	local tickbase_manip = manipulation:keybind({name = "tickbase", flag = "tickbase_manip", tip = "Manipulates tickbase for some features.", display = "tickbase"})
 	--manipulation:toggle({name = "force hit", flag = "pf_forceaim", tip = "Forces your shots to hit the target by manipulating multiple things, but it may cause issues."})
 	manipulation:toggle({name = "backtrack", flag = "pf_rage_backtrack", tip = "Allows you to shoot at previous positions of players."})
@@ -7688,39 +7587,8 @@ if game.GameId == 113491250 then
 							end
 
 							-- Rapidfire Exploits
-							if tickbase_manip.active and burst_exploit.active then
-								local fm_index = (weapon._firemodeIndex % #weapon:getWeaponStat("firemodes")) + 1
-								setreadonly(weapon._weaponData, false)
-								weapon._weaponData.burstfirerate = 5
-								weapon._firemodeIndex = fm_index
-								weapon._burst = 1
-								if not table.find(weapon:getWeaponStat("firemodes"), "SWITCH") then
-									setreadonly(weapon:getWeaponStat("firemodes"), false)
-									table.insert(weapon:getWeaponStat("firemodes"), "SWITCH")
-									setreadonly(weapon:getWeaponStat("firemodes"), true)
-								end
-								setreadonly(weapon._weaponData, true)
-
-								if flags.rapidfire_type == "regular" then
-									library:shift_tickbase()
-									send(network, "newbullets", weapon.uniqueId, bulletData, gameClock.getTime())
-									for _, b in bullets do send(network, "bullethit", weapon.uniqueId, entry._player, target, "Head", b[2], gameClock.getTime()) end
-								elseif flags.rapidfire_type == "onshot" then
-									send(network, "newbullets", weapon.uniqueId, bulletData, gameClock.getTime())
-									for _, b in bullets do send(network, "bullethit", weapon.uniqueId, entry._player, target, "Head", b[2], gameClock.getTime()) end
-								elseif flags.rapidfire_type == "triple" then
-									local shifts = 0
-									repeat
-										shifts += 1
-										library:shift_tickbase()
-										send(network, "newbullets", weapon.uniqueId, bulletData, gameClock.getTime())
-										for _, b in bullets do send(network, "bullethit", weapon.uniqueId, entry._player, target, "Head", b[2] + (shifts - 1), gameClock.getTime()) end
-									until shifts >= 3
-								end
-							else
-								send(network, "newbullets", weapon.uniqueId, bulletData, gameClock.getTime())
-								for _, b in bullets do send(network, "bullethit", weapon.uniqueId, entry._player, target, "Head", b[2], gameClock.getTime()) end
-							end
+							send(network, "newbullets", weapon.uniqueId, bulletData, gameClock.getTime())
+							for _, b in bullets do send(network, "bullethit", weapon.uniqueId, entry._player, target, "Head", b[2], gameClock.getTime()) end
 
 							-- Tracers & Audio
 							draw_bullet(firepos, -(firepos - target).Unit * 2048, true)
@@ -7811,14 +7679,6 @@ if game.GameId == 113491250 then
 							end
 			]]
 							networkCache.lastTime = shotTime
-
-							-- OnShot Loop
-							if flags.rapidfire_type == "onshot" and tickbase_manip.active and burst_exploit.active then
-								repeat
-									library:shift_tickbase()
-									task.wait()
-								until gameClock.getTime() >= weapon._nextShot or library:get_tickbase() <= 0
-							end
 						end
 
 						-- Teleport Queue Execution
@@ -8131,32 +7991,6 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 	visuals:toggle({name = "damage logs", flag = "chatlogs"})
 
 	local sounds = utility_multi:get_tab("sounds")
-	local elapsedLoad = tick()
-	local sound_parent = sounds:dropdown({
-		name = "hit sound",
-		flag = "killsound_l",
-		items = (function() local list = {} for soundName in sfx do table.insert(list, soundName) end return list end)(),
-		multi = false,
-		popout = true,
-		callback = function(name)
-			if (tick() - elapsedLoad) < 2 then return end
-			local sfxId = sfx[flags.killsound_l]
-			if sfxId then
-				local sound = Instance.new("Sound")
-				sound.SoundId = sfxId
-				sound.Name = ""
-				sound.Volume = flags.sound_volume or 1
-				sound.PlaybackSpeed = flags.pitchrng_l and math.random(95, 105) / 100 or 1
-				sound.PlayOnRemove = true
-				sound.Parent = coregui
-				task.defer(game.Destroy, sound)
-			end
-		end,
-	})
-
-	sounds:slider({name = "volume", min = 0.5, max = 10, default = 1, flag = "sound_volume"})
-	sounds:toggle({name = "pitch randomizer", flag = "pitchrng_l"})
-	sounds:toggle({name = "only on kill", flag = "onlyonkill"})
 
 	function scanRadius(origin, maxDistance, angleCount, scanFunc)
 		local workingRays = {}
@@ -9482,19 +9316,7 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 			local message = messages[math.random(1, #messages)]
 			services.textChatService:WaitForChild("TextChannels"):WaitForChild("Global"):SendAsync(message)
 		end
-		if flags.onlyonkill then
-			local sfxId = sfx[flags.killsound_l]
-			if sfxId then
-				local sound = Instance.new("Sound")
-				sound.SoundId = sfxId
-				sound.Name = ""
-				sound.Volume = flags.sound_volume or 1
-				sound.PlaybackSpeed = flags.pitchrng_l and math.random(95, 105) / 100 or 1
-				sound.PlayOnRemove = true
-				sound.Parent = services.soundService
-				task.defer(game.Destroy, sound)
-			end
-		end
+
 	end
 	local bigAward = modules.HudNotificationInterface.bigAward
 	modules.HudNotificationInterface.bigAward = newcclosure(function(...)
@@ -10233,22 +10055,6 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 			ent += 1
 			if (ent > 100) then break end
 			local oldTickTime = gameClock.getTime()
-			if tickbase_manip.active and burst_exploit.active and not tickExploit then
-				if flags.bullets_fullshift then
-					task.spawn(function()
-						repeat
-							library:shift_tickbase()
-							fireRound(weaponObject, unknownValue, true)
-							task.wait()
-						until (library:get_tickbase() <= 0)
-					end)
-				else
-					task.spawn(function()
-						library:shift_tickbase()
-						task.delay(fireDelay / 2, fireRound, weaponObject, unknownValue, true)
-					end)
-				end
-			end
 			local tickDifference = gameClock.getTime() - oldTickTime
 			local currentTime = oldTickTime + tickDifference
 			if weaponObject._inspecting then
@@ -10585,37 +10391,11 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 		local weapon = weaponController:getActiveWeapon()
 		if not weapon or weapon:getWeaponType() ~= "Firearm" then return end
 
-		-- ===== burst exploit =====
-		if burst_exploit.active and weapon:getWeaponStat("firemodes")
-			and #weapon:getWeaponStat("firemodes") >= 1 then
-
-			local index = (weapon._firemodeIndex % #weapon:getWeaponStat("firemodes")) + 1
-			setreadonly(weapon._weaponData, false)
-			weapon._weaponData.burstfirerate = 5
-			weapon._firemodeIndex = index
-
-			if not table.find(weapon:getWeaponStat("firemodes"), "SWITCH") then
-				setreadonly(weapon:getWeaponStat("firemodes"), false)
-				table.insert(weapon:getWeaponStat("firemodes"), "SWITCH")
-				setreadonly(weapon:getWeaponStat("firemodes"), true)
-			end
-
-			setreadonly(weapon._weaponData, true)
-			
-			drawBar("rapidfire", weapon._burst / 30, true, rgb(), themes.preset.button_alt)
-
-			if (weapon._burst > 0) then
-				weapon._needRechambering = false
-				weapon._bolting = false
-				weapon._singleactionready = false
-				--weapon._firemodeIndex = table.find(weapon:getWeaponStat("firemodes"), "SWITCH") or table.find(weapon:getWeaponStat("firemodes"), "BURST") or 1
-			end
-		else
-			if weapon._burst and weapon._burst > 5 then
-				weapon._burst = 0
-			end
-			drawBar("rapidfire", 0, false, rgb(), themes.preset.button_alt)
+		-- Burst exploit disabled
+		if weapon._burst and weapon._burst > 5 then
+			weapon._burst = 0
 		end
+		drawBar("rapidfire", 0, false, rgb(), themes.preset.button_alt)
 
 		if mouseClicked > 0 then
 			mouseClicked -= globals.frametime
@@ -10656,10 +10436,6 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 					return print("Blocked reload index", i)
 				end
 			})
-		end
-
-		if burst_exploit.active and (weapon._nextShot - gameClock.getTime()) > 0 then
-			return
 		end
 
 		-- ===== origin scan visual =====
@@ -10899,11 +10675,6 @@ overshoot_parent:add(fov_tab:slider({name = "overshoot fov", min = 0, max = 360,
 				pos = cameraAngle,
 				hitboxName = targetPart.Name
 			}
-
-			if burst_exploit.active and weapon:getWeaponStat("firemodes")
-			and #weapon:getWeaponStat("firemodes") <= 1 then
-				weapon._burst = 2
-			end
 
 			if flags.pf_autofire then
 				weapon:shoot(true)
@@ -11786,7 +11557,7 @@ function handleViewmodelPart(v, dt)
 	else
 		v.Color = v:GetAttribute("Color")
 	end
-	pcall(setproperty, v, "TextureID", "")
+	pcall(function() v.TextureID = "" end)
 	v.Transparency = library.thirdPerson and 0.9999 or handle_viewmodel_transparency(1 - flags.viewmodel_color.Transparency, vm_mode, dt)
 	if v.Material == Enum.Material.ForceField and v:IsA("MeshPart") then
 		v.TextureID = forcefieldanimations[flags.viewmodel_neon_animation] or "rbxassetid://0"
@@ -15460,4 +15231,3 @@ pcall(function()
 	end
 end)
 
---"
