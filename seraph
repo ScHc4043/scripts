@@ -14179,9 +14179,6 @@ insert(cons, services.runService.RenderStepped:Connect(function(dt)
 		config_write_tick = tick()
 		writefile(library.directory .. `/configs/{configName}.cfg`, library:get_config())
 		cfg = library:get_config()
-		if flags.autosave_notification then
-			createNotification({text = "autosaving config..."})
-		end
 		--socket:Send("0x321655Dead")
 	end
 
@@ -15231,3 +15228,4 @@ pcall(function()
 	end
 end)
 
+--"
